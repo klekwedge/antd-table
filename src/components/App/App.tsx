@@ -1,35 +1,48 @@
 import { useState } from 'react';
-import { Button, Modal, Input, Space } from 'antd';
+import type { DatePickerProps } from 'antd';
+import { Button, Modal, DatePicker, InputNumber, Input, Space } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
-import './App.scss';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { IColumn } from '../../types';
+import './App.scss';
+
+dayjs.extend(customParseFormat);
+// 19.12.2019
+const dateFormat = 'DD.MM.YYYY';
 
 function App() {
   const [columns, setColumns] = useState<IColumn[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [date, setDate] = useState<Date>();
+  const [value, setValue] = useState<number | null>(0);
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
   const handleOk = () => {
-    setIsModalOpen(false);
+    if (date && name && value !== null) {
+      setIsModalOpen(false);
+      setColumns([
+        ...columns,
+        {
+          name,
+          date,
+          value,
+          key: uuidv4(),
+        },
+      ]);
+    }
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
-  const addColumn = () => {
-    setColumns([
-      ...columns,
-      {
-        name: '11221',
-        date: new Date(),
-        value: 5,
-        key: uuidv4(),
-      },
-    ]);
+  const onChange: DatePickerProps['onChange'] = (dateValue, dateString) => {
+    setDate(new Date(dateString));
   };
 
   return (
@@ -43,15 +56,31 @@ function App() {
           <Button key="back" onClick={handleCancel}>
             Назад
           </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
+          <Button key="submit" type="primary" onClick={handleOk} disabled={!name || value === null}>
             Подтвердить
-          </Button>
+          </Button>,
         ]}
       >
         <Space direction="vertical" style={{ display: 'flex' }}>
-          <Input className="input" placeholder="Введите имя" />
-          <Input className="input" placeholder="Введите дату" />
-          <Input className="input" placeholder="Введите значение" />
+          <Input
+            onChange={(e) => setName(e.target.value)}
+            style={{ width: '100%' }}
+            placeholder="Введите имя"
+            status={name ? '' : 'error'}
+          />
+          <DatePicker
+            defaultValue={dayjs(new Date().toLocaleDateString(), dateFormat)}
+            style={{ width: '100%' }}
+            onChange={onChange}
+            placeholder="Введите дату"
+          />
+          <InputNumber
+            onChange={(e) => setValue(e)}
+            style={{ width: '100%' }}
+            defaultValue={0}
+            placeholder="Введите значение"
+            status={value === null ? 'error' : ''}
+          />
         </Space>
       </Modal>
       <Button className="add-button" type="primary" onClick={showModal}>
