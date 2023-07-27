@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  width: 100vw;
+  padding: 10px 5px;
+
+  .add-button {
+    align-self: flex-end;
+    margin-bottom: 10px;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background: transparent;
+    background: rgb(22, 141, 246);
+    transition: all 0.5s ease;
+
+    &:hover {
+      background: rgb(0, 110, 255);
+    }
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+
+    tr {
+      display: flex;
+    }
+
+    td,
+    th {
+      flex: 1 1 33%;
+      border: 1px solid gray;
+      padding: 5px 10px;
+    }
+  }
+}
