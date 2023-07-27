@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { DatePickerProps } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Button, Modal, DatePicker, InputNumber, Input, Space } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
@@ -8,14 +9,13 @@ import { IColumn } from '../../types';
 import './App.scss';
 
 dayjs.extend(customParseFormat);
-// 19.12.2019
 const dateFormat = 'DD.MM.YYYY';
 
 function App() {
   const [columns, setColumns] = useState<IColumn[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
-  const [date, setDate] = useState<Date>();
+  const [date, setDate] = useState<Date>(new Date());
   const [value, setValue] = useState<number | null>(0);
 
   const showModal = () => {
@@ -34,8 +34,17 @@ function App() {
           key: uuidv4(),
         },
       ]);
+      setDate(new Date());
+      setName('');
+      setValue(0);
     }
   };
+
+  const deleteLine = (key: string) => {
+    setColumns([...columns.filter((item) => item.key !== key)]);
+  };
+
+  const editLine = (key: string) => {};
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -63,6 +72,7 @@ function App() {
       >
         <Space direction="vertical" style={{ display: 'flex' }}>
           <Input
+            value={name}
             onChange={(e) => setName(e.target.value)}
             style={{ width: '100%' }}
             placeholder="Введите имя"
@@ -75,6 +85,7 @@ function App() {
             placeholder="Введите дату"
           />
           <InputNumber
+            value={value}
             onChange={(e) => setValue(e)}
             style={{ width: '100%' }}
             defaultValue={0}
@@ -92,6 +103,7 @@ function App() {
             <th>Имя</th>
             <th>Дата</th>
             <th>Числовое значение</th>
+            <th>Действия</th>
           </tr>
         </thead>
         <tbody>
@@ -100,6 +112,12 @@ function App() {
               <td>{item.name}</td>
               <td>{item.date.toLocaleDateString()}</td>
               <td>{item.value}</td>
+              <td>
+                <Space style={{ display: 'flex' }}>
+                  <Button type="primary" onClick={() => deleteLine(item.key)} icon={<DeleteOutlined />} />
+                  <Button type="primary" onClick={() => editLine(item.key)} icon={<EditOutlined />} />
+                </Space>
+              </td>
             </tr>
           ))}
         </tbody>
