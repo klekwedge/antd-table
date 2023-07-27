@@ -1,30 +1,79 @@
 import { useState } from 'react';
+import { Button, Modal, Input, Space } from 'antd';
+import { v4 as uuidv4 } from 'uuid';
 import './App.scss';
 import { IColumn } from '../../types';
 
 function App() {
   const [columns, setColumns] = useState<IColumn[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const addColumn = () => {};
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const addColumn = () => {
+    setColumns([
+      ...columns,
+      {
+        name: '11221',
+        date: new Date(),
+        value: 5,
+        key: uuidv4(),
+      },
+    ]);
+  };
 
   return (
     <div className="container">
-      <button className='add-button' type="button" onClick={addColumn}>
+      <Modal
+        title="Добавить запись"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Назад
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleOk}>
+            Подтвердить
+          </Button>
+        ]}
+      >
+        <Space direction="vertical" style={{ display: 'flex' }}>
+          <Input className="input" placeholder="Введите имя" />
+          <Input className="input" placeholder="Введите дату" />
+          <Input className="input" placeholder="Введите значение" />
+        </Space>
+      </Modal>
+      <Button className="add-button" type="primary" onClick={showModal}>
         Добавить
-      </button>
+      </Button>
       <table>
-        <tr>
-          <th>Имя</th>
-          <th>Дата</th>
-          <th>Числовое значение</th>
-        </tr>
-        {
-          columns.map(item => <tr>
-            <td>{item.name}</td>
-            <td>{item.date.toLocaleDateString()}</td>
-            <td>{item.value}</td>
-          </tr>)
-        }
+        <thead>
+          <tr>
+            <th>Имя</th>
+            <th>Дата</th>
+            <th>Числовое значение</th>
+          </tr>
+        </thead>
+        <tbody>
+          {columns.map((item) => (
+            <tr key={item.key}>
+              <td>{item.name}</td>
+              <td>{item.date.toLocaleDateString()}</td>
+              <td>{item.value}</td>
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );
