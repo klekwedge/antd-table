@@ -4,6 +4,7 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Button, Modal, DatePicker, InputNumber, Input, Space, Table, Tag } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
+import type { ColumnsType, TableProps } from 'antd/es/table';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { ILine } from '../../types';
 import './App.scss';
@@ -23,6 +24,50 @@ function App() {
   const showModal = () => {
     setIsModalOpen(true);
   };
+
+  const deleteLine = (key: string) => {
+    setLines([...lines.filter((line) => line.key !== key)]);
+  };
+
+  const editLine = (line: ILine) => {
+    setCurrentEditLine(line);
+    setValue(line.value);
+    setName(line.name);
+    setDate(line.date);
+    setIsModalOpen(true);
+  };
+
+  const columns: ColumnsType<ILine> = [
+    {
+      title: 'Имя',
+      dataIndex: 'name',
+      sortDirections: ['descend'],
+      sorter: (a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1  ,
+    },
+    {
+      title: 'Дата',
+      dataIndex: 'date',
+      sortDirections: ['descend'],
+      sorter: (a, b) => a.date.getTime() - b.date.getTime(),
+      render: (item) => <>{item.toLocaleDateString()}</>,
+    },
+    {
+      title: 'Значение',
+      dataIndex: 'value',
+      sortDirections: ['descend'],
+      sorter: (a, b) => a.value - b.value,
+    },
+    {
+      title: 'Действия',
+      dataIndex: 'action',
+      render: (_: any, record: ILine) => (
+        <Space>
+          <Button type="primary" onClick={() => deleteLine(record.key)} icon={<DeleteOutlined />} />
+          <Button type="primary" onClick={() => editLine(record)} icon={<EditOutlined />} />
+        </Space>
+      ),
+    },
+  ];
 
   const handleOk = () => {
     if (date && name && value !== null) {
@@ -56,18 +101,6 @@ function App() {
       setValue(0);
       setIsModalOpen(false);
     }
-  };
-
-  const deleteLine = (key: string) => {
-    setLines([...lines.filter((line) => line.key !== key)]);
-  };
-
-  const editLine = (line: ILine) => {
-    setCurrentEditLine(line);
-    setValue(line.value);
-    setName(line.name);
-    setDate(line.date);
-    setIsModalOpen(true);
   };
 
   const handleCancel = () => {
@@ -126,8 +159,9 @@ function App() {
         Добавить
       </Button>
 
-      <Table dataSource={lines}>
-        <Column title="Имя" dataIndex="name" key="name" />
+      <Table columns={columns} dataSource={lines} />
+
+      {/* <Column title="Имя" dataIndex="name" key="name" />
         <Column title="Дата" dataIndex="date" key="date" render={(item) => <>{item.toLocaleDateString()}</>} />
         <Column title="Значение" dataIndex="value" key="value" />
         <Column
@@ -139,8 +173,7 @@ function App() {
               <Button type="primary" onClick={() => editLine(record)} icon={<EditOutlined />} />
             </Space>
           )}
-        />
-      </Table>
+        /> */}
     </div>
   );
 }
