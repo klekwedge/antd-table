@@ -41,7 +41,7 @@ function App() {
       title: 'Имя',
       dataIndex: 'name',
       sortDirections: ['descend'],
-      sorter: (a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1  ,
+      sorter: (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1),
     },
     {
       title: 'Дата',
