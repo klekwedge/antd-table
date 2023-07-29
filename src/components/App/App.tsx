@@ -11,7 +11,6 @@ import './App.scss';
 
 dayjs.extend(customParseFormat);
 const dateFormat = 'DD.MM.YYYY';
-const { Column, ColumnGroup } = Table;
 
 function App() {
   const [lines, setLines] = useState<ILine[]>([]);
@@ -158,22 +157,7 @@ function App() {
       <Button className="add-button" type="primary" onClick={showModal}>
         Добавить
       </Button>
-
-      <Table columns={columns} dataSource={lines} />
-
-      {/* <Column title="Имя" dataIndex="name" key="name" />
-        <Column title="Дата" dataIndex="date" key="date" render={(item) => <>{item.toLocaleDateString()}</>} />
-        <Column title="Значение" dataIndex="value" key="value" />
-        <Column
-          title="Действия"
-          key="action"
-          render={(_: any, record: ILine) => (
-            <Space>
-              <Button type="primary" onClick={() => deleteLine(record.key)} icon={<DeleteOutlined />} />
-              <Button type="primary" onClick={() => editLine(record)} icon={<EditOutlined />} />
-            </Space>
-          )}
-        /> */}
+      <Table columns={columns} dataSource={lines} pagination={false} />
     </div>
   );
 }
