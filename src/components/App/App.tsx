@@ -5,11 +5,11 @@ import type { DatePickerProps } from 'antd';
 import type { FilterConfirmProps } from 'antd/es/table/interface';
 import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Modal, DatePicker, InputNumber, Input, Space, Table, InputRef } from 'antd';
+import type { ColumnType, ColumnsType } from 'antd/es/table';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
-import type { ColumnType, ColumnsType } from 'antd/es/table';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import Highlighter from 'react-highlight-words';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { ILine } from '../../types';
 import './App.scss';
 
