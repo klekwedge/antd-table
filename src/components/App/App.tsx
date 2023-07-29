@@ -124,14 +124,14 @@ function App() {
     {
       title: 'Имя',
       dataIndex: 'name',
-      sortDirections: ['descend'],
-      sorter: (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1),
+      sortDirections: ['descend', 'ascend'],
       ...getColumnSearchProps('name'),
+      sorter: (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1),
     },
     {
       title: 'Дата',
       dataIndex: 'date',
-      sortDirections: ['descend'],
+      sortDirections: ['descend', 'ascend'],
       sorter: (a, b) => a.date.getTime() - b.date.getTime(),
       ...getColumnSearchProps('date'),
       render: (item) => <>{item.toLocaleDateString()}</>,
@@ -139,9 +139,9 @@ function App() {
     {
       title: 'Значение',
       dataIndex: 'value',
-      sortDirections: ['descend'],
-      sorter: (a, b) => a.value - b.value,
+      sortDirections: ['descend', 'ascend'],
       ...getColumnSearchProps('value'),
+      sorter: (a, b) => a.value - b.value,
     },
     {
       title: 'Действия',
