@@ -1,4 +1,4 @@
-export interface IColumn {
+export interface ILine{
     name: string;
     date: Date;
     value: number;

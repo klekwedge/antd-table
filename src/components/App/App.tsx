@@ -5,15 +5,16 @@ import { Button, Modal, DatePicker, InputNumber, Input, Space } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { IColumn } from '../../types';
+import { ILine } from '../../types';
 import './App.scss';
 
 dayjs.extend(customParseFormat);
 const dateFormat = 'DD.MM.YYYY';
 
 function App() {
-  const [columns, setColumns] = useState<IColumn[]>([]);
+  const [columns, setColumns] = useState<ILine[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentEditLine, setCurrentEditLine] = useState<ILine | null>(null);
   const [name, setName] = useState('');
   const [date, setDate] = useState<Date>(new Date());
   const [value, setValue] = useState<number | null>(0);
@@ -24,19 +25,35 @@ function App() {
 
   const handleOk = () => {
     if (date && name && value !== null) {
-      setIsModalOpen(false);
-      setColumns([
-        ...columns,
-        {
-          name,
-          date,
-          value,
-          key: uuidv4(),
-        },
-      ]);
+      if (currentEditLine) {
+        setColumns([
+          ...columns.map((item) =>
+            item.key === currentEditLine.key
+              ? {
+                  ...currentEditLine,
+                  name,
+                  date,
+                  value,
+                }
+              : item,
+          ),
+        ]);
+      } else {
+        setColumns([
+          ...columns,
+          {
+            name,
+            date,
+            value,
+            key: uuidv4(),
+          },
+        ]);
+      }
+
       setDate(new Date());
       setName('');
       setValue(0);
+      setIsModalOpen(false);
     }
   };
 
@@ -44,10 +61,20 @@ function App() {
     setColumns([...columns.filter((item) => item.key !== key)]);
   };
 
-  const editLine = (key: string) => {};
+  const editLine = (line: ILine) => {
+    setCurrentEditLine(line);
+    setValue(line.value);
+    setName(line.name);
+    setDate(line.date);
+    setIsModalOpen(true);
+  };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setCurrentEditLine(null);
+    setDate(new Date());
+    setName('');
+    setValue(0);
   };
 
   const onChange: DatePickerProps['onChange'] = (dateValue, dateString) => {
@@ -115,7 +142,7 @@ function App() {
               <td>
                 <Space style={{ display: 'flex' }}>
                   <Button type="primary" onClick={() => deleteLine(item.key)} icon={<DeleteOutlined />} />
-                  <Button type="primary" onClick={() => editLine(item.key)} icon={<EditOutlined />} />
+                  <Button type="primary" onClick={() => editLine(item)} icon={<EditOutlined />} />
                 </Space>
               </td>
             </tr>
