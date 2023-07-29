@@ -1,11 +1,15 @@
-import { useState } from 'react';
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable react/no-unstable-nested-components */
+import { useState, useRef } from 'react';
 import type { DatePickerProps } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Modal, DatePicker, InputNumber, Input, Space, Table, Tag } from 'antd';
+import type { FilterConfirmProps } from 'antd/es/table/interface';
+import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Modal, DatePicker, InputNumber, Input, Space, Table, InputRef } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
-import type { ColumnsType, TableProps } from 'antd/es/table';
+import type { ColumnType, ColumnsType } from 'antd/es/table';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import Highlighter from 'react-highlight-words';
 import { ILine } from '../../types';
 import './App.scss';
 
@@ -19,6 +23,26 @@ function App() {
   const [name, setName] = useState('');
   const [date, setDate] = useState<Date>(new Date());
   const [value, setValue] = useState<number | null>(0);
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef<InputRef>(null);
+
+  type DataIndex = keyof ILine;
+
+  const handleSearch = (
+    selectedKeys: string[],
+    confirm: (param?: FilterConfirmProps) => void,
+    dataIndex: DataIndex,
+  ) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters: () => void) => {
+    clearFilters();
+    setSearchText('');
+  };
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -36,18 +60,80 @@ function App() {
     setIsModalOpen(true);
   };
 
+  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<ILine> => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Поиск
+          </Button>
+          <Button onClick={() => clearFilters && handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+            Сброс
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            Закрыть
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+    onFilter: (val, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes((val as string).toLowerCase()),
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
+      ),
+  });
+
   const columns: ColumnsType<ILine> = [
     {
       title: 'Имя',
       dataIndex: 'name',
       sortDirections: ['descend'],
       sorter: (a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1),
+      ...getColumnSearchProps('name'),
     },
     {
       title: 'Дата',
       dataIndex: 'date',
       sortDirections: ['descend'],
       sorter: (a, b) => a.date.getTime() - b.date.getTime(),
+      ...getColumnSearchProps('date'),
       render: (item) => <>{item.toLocaleDateString()}</>,
     },
     {
@@ -55,6 +141,7 @@ function App() {
       dataIndex: 'value',
       sortDirections: ['descend'],
       sorter: (a, b) => a.value - b.value,
+      ...getColumnSearchProps('value'),
     },
     {
       title: 'Действия',
@@ -99,6 +186,7 @@ function App() {
       setName('');
       setValue(0);
       setIsModalOpen(false);
+      setCurrentEditLine(null);
     }
   };
 
