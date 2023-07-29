@@ -4,7 +4,7 @@
   flex-direction: column;
   justify-content: center;
   width: 100vw;
-  padding: 10px 5px;
+  padding: 10px 20px;
 
   .input {
     margin-bottom: 10px;
@@ -13,26 +13,5 @@
   .add-button {
     align-self: flex-end;
     margin-bottom: 10px;
-  }
-
-  table {
-    border-collapse: collapse;
-    width: 100%;
-
-    tr {
-      display: flex;
-    }
-
-    td,
-    th {
-      flex: 1 1 33%;
-      border: 1px solid gray;
-      padding: 5px 10px;
-    }
-
-    td:last-child,
-    th:last-child {
-      flex: 0 0 9%;
-    }
   }
 }

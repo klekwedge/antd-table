@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { DatePickerProps } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Modal, DatePicker, InputNumber, Input, Space } from 'antd';
+import { Button, Modal, DatePicker, InputNumber, Input, Space, Table, Tag } from 'antd';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -10,9 +10,10 @@ import './App.scss';
 
 dayjs.extend(customParseFormat);
 const dateFormat = 'DD.MM.YYYY';
+const { Column, ColumnGroup } = Table;
 
 function App() {
-  const [columns, setColumns] = useState<ILine[]>([]);
+  const [lines, setLines] = useState<ILine[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEditLine, setCurrentEditLine] = useState<ILine | null>(null);
   const [name, setName] = useState('');
@@ -26,21 +27,21 @@ function App() {
   const handleOk = () => {
     if (date && name && value !== null) {
       if (currentEditLine) {
-        setColumns([
-          ...columns.map((item) =>
-            item.key === currentEditLine.key
+        setLines([
+          ...lines.map((line) =>
+            line.key === currentEditLine.key
               ? {
                   ...currentEditLine,
                   name,
                   date,
                   value,
                 }
-              : item,
+              : line,
           ),
         ]);
       } else {
-        setColumns([
-          ...columns,
+        setLines([
+          ...lines,
           {
             name,
             date,
@@ -58,7 +59,7 @@ function App() {
   };
 
   const deleteLine = (key: string) => {
-    setColumns([...columns.filter((item) => item.key !== key)]);
+    setLines([...lines.filter((line) => line.key !== key)]);
   };
 
   const editLine = (line: ILine) => {
@@ -124,31 +125,22 @@ function App() {
       <Button className="add-button" type="primary" onClick={showModal}>
         Добавить
       </Button>
-      <table>
-        <thead>
-          <tr>
-            <th>Имя</th>
-            <th>Дата</th>
-            <th>Числовое значение</th>
-            <th>Действия</th>
-          </tr>
-        </thead>
-        <tbody>
-          {columns.map((item) => (
-            <tr key={item.key}>
-              <td>{item.name}</td>
-              <td>{item.date.toLocaleDateString()}</td>
-              <td>{item.value}</td>
-              <td>
-                <Space style={{ display: 'flex' }}>
-                  <Button type="primary" onClick={() => deleteLine(item.key)} icon={<DeleteOutlined />} />
-                  <Button type="primary" onClick={() => editLine(item)} icon={<EditOutlined />} />
-                </Space>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      <Table dataSource={lines}>
+        <Column title="Имя" dataIndex="name" key="name" />
+        <Column title="Дата" dataIndex="date" key="date" render={(item) => <>{item.toLocaleDateString()}</>} />
+        <Column title="Значение" dataIndex="value" key="value" />
+        <Column
+          title="Действия"
+          key="action"
+          render={(_: any, record: ILine) => (
+            <Space>
+              <Button type="primary" onClick={() => deleteLine(record.key)} icon={<DeleteOutlined />} />
+              <Button type="primary" onClick={() => editLine(record)} icon={<EditOutlined />} />
+            </Space>
+          )}
+        />
+      </Table>
     </div>
   );
 }

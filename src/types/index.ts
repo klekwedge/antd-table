@@ -1,6 +1,6 @@
-export interface ILine{
+export interface ILine {
     name: string;
-    date: Date;
+    date: string;
     value: number;
     key: string;
 }
