@@ -1,5 +1,7 @@
 # Тестовое задание
 
+**You can also read this README in [English](https://github.com/klekwedge/kaspel-test-task/blob/main/README.EN.md).**
+
 ## Оглавление
 
 - [Инструкции по развертыванию](#инструкции-по-развертыванию)
